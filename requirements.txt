@@ -3,6 +3,7 @@ python-dotenv
 requests
 llama-index
 llama-index-llms-groq
+llama-index-embeddings-huggingface
 huggingface-hub
 torch
 transformers
