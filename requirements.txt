@@ -2,6 +2,7 @@ streamlit
 python-dotenv
 requests
 llama-index
+llama-index-llms-groq
 huggingface-hub
 torch
 transformers
