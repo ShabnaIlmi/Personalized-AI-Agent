@@ -1,7 +1,6 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-load_dotenv()
 
 from llama_index.llms.groq import Groq
 from llama_index.core import Settings
