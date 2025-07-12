@@ -1,3 +1,4 @@
+# Importing the necessary libraries
 import os
 import streamlit as st
 from dotenv import load_dotenv
@@ -24,7 +25,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS with enhanced search bar styling
+# Custom CSS 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -514,7 +515,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load environment variables
+# Loading the environment variables
 @st.cache_data
 def load_environment_variables():
     return {
@@ -533,12 +534,12 @@ CHUNK_OVERLAP = 20
 OUTPUT_TOKENS = 1024
 CHUNK_SIZE = 1000
 
-# Initialize LLM
+# Initializing the LLM
 @st.cache_resource
 def get_llm():
     return Groq(model=MODEL_NAME, api_key=env_vars["GROQ_API_KEY"], temperature=0.7)
 
-# Initialize Memory
+# Initializing the Memory
 @st.cache_resource
 def get_memory():
     if env_vars["MEM0_API_KEY"]:
@@ -550,7 +551,7 @@ def get_memory():
         )
     return None
 
-# Initialize Settings
+# Initializing the Settings
 @st.cache_resource
 def initialize_settings():
     Settings.llm = get_llm()
@@ -558,7 +559,7 @@ def initialize_settings():
     Settings.num_output = OUTPUT_TOKENS
     Settings.node_parser = SentenceWindowNodeParser(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     
-    # Add memory if available
+    # Adding the memory after the availability check
     memory = get_memory()
     if memory:
         Settings.memory = memory
@@ -573,18 +574,18 @@ def process_uploaded_files(uploaded_files):
     
     try:
         for uploaded_file in uploaded_files:
-            # Save uploaded file to temporary directory
+            
             temp_path = os.path.join(temp_dir, uploaded_file.name)
             with open(temp_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             
-            # Read document based on file type
+            
             if uploaded_file.type == "text/plain":
                 content = uploaded_file.read().decode("utf-8")
                 doc = Document(text=content, metadata={"filename": uploaded_file.name, "type": "text"})
                 documents.append(doc)
             elif uploaded_file.type == "application/pdf":
-                # For PDF files, use SimpleDirectoryReader
+                
                 try:
                     pdf_docs = SimpleDirectoryReader(input_files=[temp_path]).load_data()
                     for doc in pdf_docs:
@@ -593,7 +594,7 @@ def process_uploaded_files(uploaded_files):
                 except Exception as e:
                     st.error(f"Error processing PDF {uploaded_file.name}: {e}")
             else:
-                # Try to read as text for other file types
+                
                 try:
                     content = uploaded_file.read().decode("utf-8")
                     doc = Document(text=content, metadata={"filename": uploaded_file.name, "type": uploaded_file.type})
@@ -603,10 +604,10 @@ def process_uploaded_files(uploaded_files):
         
         return documents
     finally:
-        # Clean up temporary directory
+        
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-# Create index from documents
+# Fuction to create index from documents
 def create_document_index(documents):
     """Create vector index from documents"""
     if not documents:
@@ -619,11 +620,12 @@ def create_document_index(documents):
         st.error(f"Error creating document index: {e}")
         return None
 
-# Utility functions (expanded for general use)
+# Utility functions 
+# Simple Calculator Function
 def calculate(expression: str) -> str:
     """Safely evaluate mathematical expressions"""
     try:
-        # Only allow safe mathematical operations
+        
         allowed_chars = set('0123456789+-*/.() ')
         if not all(c in allowed_chars for c in expression):
             return "Invalid characters in expression"
@@ -633,6 +635,7 @@ def calculate(expression: str) -> str:
     except Exception as e:
         return f"Error in calculation: {e}"
 
+# Word Count Calculation Function
 def word_count(text: str) -> str:
     """Count words, characters, and paragraphs in text"""
     words = len(text.split())
@@ -642,6 +645,7 @@ def word_count(text: str) -> str:
     
     return f"Words: {words}, Characters: {chars}, Characters (no spaces): {chars_no_spaces}, Paragraphs: {paragraphs}"
 
+# Currency Convertor Function
 def currency_converter(amount: float, from_currency: str, to_currency: str) -> str:
     """Convert currency (basic rates for demo)"""
     exchange_rates = {
@@ -660,6 +664,7 @@ def currency_converter(amount: float, from_currency: str, to_currency: str) -> s
     else:
         return f"Exchange rate not available for {from_currency} to {to_currency}"
 
+# Unit Convertor Function
 def unit_converter(value: float, from_unit: str, to_unit: str) -> str:
     """Convert between common units"""
     conversions = {
@@ -691,11 +696,13 @@ def unit_converter(value: float, from_unit: str, to_unit: str) -> str:
     else:
         return f"Conversion not available for {from_unit} to {to_unit}"
 
+# Get Current Time Function
 def get_current_time() -> str:
     """Get current date and time"""
     now = datetime.datetime.now()
     return f"Current date and time: {now.strftime('%Y-%m-%d %H:%M:%S')}"
 
+# Real-Time Google Search Function
 def google_search(query: str) -> str:
     """Search Google for information"""
     if not env_vars["GOOGLE_API_KEY"] or not env_vars["GOOGLE_CX"]:
@@ -706,34 +713,35 @@ def google_search(query: str) -> str:
         response = requests.get(url).json()
         if "items" in response:
             results = []
-            for item in response["items"][:3]:  # Get top 3 results
+            for item in response["items"][:3]:  
                 results.append(f"Title: {item['title']}\nSnippet: {item['snippet']}\nURL: {item['link']}\n")
             return "\n".join(results)
         return "No relevant information found."
     except Exception as e:
         return f"Search error: {e}"
 
+# Document Summarizing Function
 def summarize_text(text: str, max_sentences: int = 3) -> str:
     """Simple text summarization"""
     sentences = text.split('.')
     if len(sentences) <= max_sentences:
         return text
     
-    # Simple approach: take first and last sentences, and one from middle
+    # Simple approach - taking the first and last sentences, and one from middle
     summary_sentences = []
     summary_sentences.append(sentences[0])
     if len(sentences) > 2:
         summary_sentences.append(sentences[len(sentences)//2])
-    summary_sentences.append(sentences[-2])  # -1 is usually empty after split
+    summary_sentences.append(sentences[-2]) 
     
     return '. '.join(summary_sentences) + '.'
 
-# Initialize agent
+# Initializig the agent
 @st.cache_resource
 def initialize_agent(_document_query_engine=None):
     settings = initialize_settings()
     
-    # Create general-purpose tools
+    # Creating the general-purpose tools
     tools = [
         FunctionTool.from_defaults(fn=calculate, name="Calculator", description="Perform mathematical calculations with basic operations."),
         FunctionTool.from_defaults(fn=word_count, name="TextAnalyzer", description="Count words, characters, and paragraphs in text."),
@@ -744,7 +752,7 @@ def initialize_agent(_document_query_engine=None):
         FunctionTool.from_defaults(fn=summarize_text, name="TextSummarizer", description="Summarize long text into key points.")
     ]
     
-    # Add document query tool if available
+    # Adding document query tool after the availability check
     if _document_query_engine:
         document_tool = QueryEngineTool.from_defaults(
             query_engine=_document_query_engine,
@@ -753,7 +761,7 @@ def initialize_agent(_document_query_engine=None):
         )
         tools.append(document_tool)
     
-    # Create agent
+    # Creating the agent
     agent = ReActAgent.from_tools(
         tools,
         llm=settings.llm,
@@ -765,11 +773,9 @@ def initialize_agent(_document_query_engine=None):
 
 # Streamlit UI
 def main():
-    # Main header with improved gradient styling
     st.markdown('<h1 class="main-title">Personal AI Assistant ✨</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Your friendly AI companion powered by Llama 3.3</p>', unsafe_allow_html=True)
     
-    # Header info cards with high contrast
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown('''
@@ -793,11 +799,9 @@ def main():
         </div>
         ''', unsafe_allow_html=True)
     
-    # Sidebar for configuration and document upload
     with st.sidebar:
         st.markdown('<div style="text-align: center; padding: 1rem;"><h2>✨ AI Assistant</h2></div>', unsafe_allow_html=True)
         
-        # Quick action buttons
         st.markdown('<div class="capability-card"><h4>🎯 Try asking me...</h4></div>', unsafe_allow_html=True)
         
         if st.button("Tell me a fun fact about space", key="space_fact"):
@@ -814,10 +818,8 @@ def main():
         
         st.markdown("---")
         
-        # My Capabilities section with vibrant styling
         st.markdown('<div class="capability-card"><h4 style="color: #2d3436;">✨ My Capabilities</h4></div>', unsafe_allow_html=True)
         
-        # Capability grid with joyful colors
         col1, col2 = st.columns(2)
         with col1:
             st.markdown('''
@@ -863,7 +865,6 @@ def main():
         
         st.markdown("---")
         
-        # Document upload section
         st.markdown('<div style="color: white; font-weight: 600; font-size: 1.2rem;">📄 Document Upload</div>', unsafe_allow_html=True)
         uploaded_files = st.file_uploader(
             "",
@@ -881,7 +882,7 @@ def main():
                     document_query_engine = create_document_index(documents)
                     st.success(f"✅ Processed {len(documents)} documents")
                     
-                    # Show document info
+                    # Displaying the document information
                     st.markdown('<div style="color: white; font-weight: 600;">**📋 Uploaded Documents:**</div>', unsafe_allow_html=True)
                     for doc in documents:
                         filename = doc.metadata.get('filename', 'Unknown')
@@ -889,7 +890,7 @@ def main():
         
         st.markdown("---")
         
-        # Available tools with joyful styling
+        # Available tools 
         st.markdown('<div style="color: white; font-weight: 600; font-size: 1.2rem;">🛠️ Available Tools</div>', unsafe_allow_html=True)
         st.markdown('''
         <div class="tools-list">
@@ -907,7 +908,7 @@ def main():
         
         st.markdown("---")
         
-        # Sample questions with vibrant buttons
+        # Sample questions 
         st.markdown('<div style="color: white; font-weight: 600; font-size: 1.2rem;">💡 Sample Questions</div>', unsafe_allow_html=True)
         sample_questions = [
             "What's 15% of 250?",
@@ -924,23 +925,23 @@ def main():
             if st.button(question, key=f"sample_{question}"):
                 st.session_state.sample_question = question
     
-    # Initialize session state
+    # Initializing session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
-    # Initialize or update agent with document query engine
+    # Initializing or updating agent with document query engine
     if document_query_engine:
         st.session_state.agent = initialize_agent(document_query_engine)
     elif "agent" not in st.session_state:
         with st.spinner("🚀 Initializing AI Assistant..."):
             st.session_state.agent = initialize_agent()
     
-    # Display chat messagesa
+    # Displaying chat messagesa
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     
-    # Handle sample question
+    # Handling sample question
     if hasattr(st.session_state, 'sample_question'):
         prompt = st.session_state.sample_question
         del st.session_state.sample_question
@@ -948,7 +949,7 @@ def main():
         prompt = st.chat_input("Ask me anything...")
     
     if prompt:
-        # Display user message
+        # Displaying user message
         st.chat_message("user").markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
         
@@ -964,7 +965,7 @@ def main():
                     st.error(error_message)
                     st.session_state.messages.append({"role": "assistant", "content": error_message})
 
-    # Status indicators at bottom
+    # Status indicators
     st.markdown("---")
     col1, col2, col3 = st.columns(3)
     
