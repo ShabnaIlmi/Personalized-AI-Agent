@@ -198,11 +198,16 @@ To add custom tools:
 ### File Structure
 ```
 personal-ai-assistant/
-├── app.py                 # Main application
-├── .env                   # Environment variables
-├── requirements.txt       # Python dependencies
-├── README.md             # This file
-└── temp/                 # Temporary files (auto-created)
+├── Budget_Data/              # Folder
+├── data/                     # Folder
+├── storage/                  # Folder
+├── venv/                     # Folder
+├── agent.py                  # Python file (34 KB)
+├── chatbot.py                # Python file (2 KB)
+├── memory.py                 # Python file (2 KB)
+├── README.md                 # Markdown file (8 KB)
+├── requirements.txt          # Text file (1 KB)
+
 ```
 
 ### Performance Optimization
