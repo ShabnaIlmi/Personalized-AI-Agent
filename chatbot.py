@@ -1,3 +1,4 @@
+# Importing the necessary libraries
 import os
 from dotenv import load_dotenv
 
@@ -5,7 +6,7 @@ from dotenv import load_dotenv
 import streamlit as st
 from llama_index.llms.groq import Groq
 
-# Load API key from environment
+# Loading the API key from environment
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Function to generate chatbot response
@@ -17,22 +18,22 @@ def chat_qa(prompt):
 # Streamlit UI
 st.title(f"*My AI :green[Chatbot]* :sparkles:")
 
-# Initialize chat history
+# Initializing chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat messages
+# Displaying chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # User Input Section
 if prompt := st.chat_input("Ask any question here !"):
-    # Display user message
+    # Displaying user message
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Get Response from chatbot
+    #Chat Responses
     response = chat_qa(prompt)
 
     # Display assistant message
