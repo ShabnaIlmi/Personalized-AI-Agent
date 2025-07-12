@@ -61,7 +61,7 @@ A powerful, feature-rich AI assistant built with Streamlit and powered by Llama 
 
 4. **Run the application**
    ```bash
-   streamlit run app.py
+   streamlit run agent.py
    ```
 
 5. **Open in browser**
